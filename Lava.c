@@ -1,0 +1,11 @@
+// Exported by NeoTile
+
+const unsigned short Lava[1][8] =
+{
+	{0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff}
+};
+
+enum
+{
+	TileLava=0
+};
