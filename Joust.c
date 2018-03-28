@@ -99,7 +99,7 @@ u8 JoustCollision(PLAYER sprPlayer, PLAYER sprBuzzard)
 	u16 xDistance;
 	u16 yDistance;
 	u8 iReturn;
-	//Routine to determine collision between player and beastie
+	//Routine to determine collision between player and Enemy
 
 	//Collision will occur when there is less than 8 points betwixt the centre's of
 	//the two sprites
@@ -545,13 +545,13 @@ PLAYER MovePlayer(PLAYER sprPlayer, GAME gameJoust)
 		sprPlayer.Direction=0;
 	}
 
-	//Finally. Calculate collisions with the beasties (is this best in the beastie loop? Probably)
+	//Finally. Calculate collisions with the Enemys (is this best in the Enemy loop? Probably)
 	sprPlayer=MoveJoustSprite(sprPlayer, gameJoust);
 
 	return sprPlayer;
 }
 
-PLAYER MoveBeastie(PLAYER sprBeastie, PLAYER * sprPlayer, GAME gameJoust)
+PLAYER MoveEnemy(PLAYER sprEnemy, PLAYER * sprPlayer, GAME gameJoust)
 {
 	u8 iTileX;
 	u8 iTileY;
@@ -572,41 +572,41 @@ PLAYER MoveBeastie(PLAYER sprBeastie, PLAYER * sprPlayer, GAME gameJoust)
 
 	*/
 
-	if (Sin(sprBeastie.FlapCount)<=0)
+	if (Sin(sprEnemy.FlapCount)<=0)
 	{
-		sprBeastie.Animation=0;
+		sprEnemy.Animation=0;
 	}
 	else
 	{
-		sprBeastie.Animation=1;
+		sprEnemy.Animation=1;
 	}
-	sprBeastie.Velocity=Sin(sprBeastie.FlapCount)>>sprBeastie.Type;
+	sprEnemy.Velocity=Sin(sprEnemy.FlapCount)>>sprEnemy.Type;
 
-	sprBeastie.FlapCount++;
-	if (sprBeastie.FlapCount==0)
+	sprEnemy.FlapCount++;
+	if (sprEnemy.FlapCount==0)
 	{
 		//Change direction when flapcount loops
 		if (QRandom()>gameJoust.FlapProbability)
 		{
-			//This will have the effect of moving the beastie slightyl up or down
+			//This will have the effect of moving the Enemy slightyl up or down
 			//by altering where in the flap cycle it is.
-			sprBeastie.FlapCount=QRandom();
+			sprEnemy.FlapCount=QRandom();
 		}
 		if (QRandom()>gameJoust.SwitchProbability)
 		{
 			//Not entirely sure if this is doing anything...
-			sprBeastie.Direction=sprBeastie.Direction^1;
-			sprBeastie.Drift=sprBeastie.Drift*(-1);
+			sprEnemy.Direction=sprEnemy.Direction^1;
+			sprEnemy.Drift=sprEnemy.Drift*(-1);
 		}
 	}
 
-	iTileX=sprBeastie.xPosition>>11;
-	iTileY=sprBeastie.yPosition>>11;
+	iTileX=sprEnemy.xPosition>>11;
+	iTileY=sprEnemy.yPosition>>11;
 
 	iCollision=BackgroundCollisionTest(iTileX, iTileY);
 	if (iCollision & DIR_UP)
 	{
-		sprBeastie.Velocity=64>>sprBeastie.Type;
+		sprEnemy.Velocity=64>>sprEnemy.Type;
 		//Cancel all flaps?
 
 	}
@@ -616,59 +616,59 @@ PLAYER MoveBeastie(PLAYER sprBeastie, PLAYER * sprPlayer, GAME gameJoust)
 		//Must remember that Buzzards never walk!
 		//Change mode to "walking"
 		//This is very very poor.
-		sprBeastie.Velocity=-64>>sprBeastie.Type;
+		sprEnemy.Velocity=-64>>sprEnemy.Type;
 	}
 	if (iCollision & DIR_LEFT)
 	{
-		sprBeastie.Direction=0;
-		sprBeastie.Drift=64;
+		sprEnemy.Direction=0;
+		sprEnemy.Drift=64;
 	}
 	if (iCollision & DIR_RIGHT)
 	{
-		sprBeastie.Direction=1;
-		sprBeastie.Drift=-64;
+		sprEnemy.Direction=1;
+		sprEnemy.Drift=-64;
 	}
 
 	//Test for hitting the top of the screen
-	if (sprBeastie.Velocity>=0)
+	if (sprEnemy.Velocity>=0)
 	{
-		sprBeastie.yPosition+=sprBeastie.Velocity;
+		sprEnemy.yPosition+=sprEnemy.Velocity;
 	}
-	else if (sprBeastie.yPosition+sprBeastie.Velocity<sprBeastie.yPosition)
+	else if (sprEnemy.yPosition+sprEnemy.Velocity<sprEnemy.yPosition)
 	{
-		sprBeastie.yPosition+=sprBeastie.Velocity;
+		sprEnemy.yPosition+=sprEnemy.Velocity;
 	}
 	else
 	{
-		sprBeastie.yPosition=64>>sprBeastie.Type;
+		sprEnemy.yPosition=64>>sprEnemy.Type;
 	}
 
-	sprBeastie.xPosition+=sprBeastie.Drift;
+	sprEnemy.xPosition+=sprEnemy.Drift;
 
 	//Test to see whether the player is in the lava...
 	//Fairly simple really, if the player is lower than a certain point. Then they're dead!
-	if (sprBeastie.yPosition > 34816)
+	if (sprEnemy.yPosition > 34816)
 	{
 		//set appropriate flags
-		sprBeastie.Flags=FLAG_EGG;
-		sprBeastie.FlapCount=0;
+		sprEnemy.Flags=FLAG_EGG;
+		sprEnemy.FlapCount=0;
 
 	}
 
 	//Finally, check for collision with the player
 
-	iCollision=JoustCollision(sprBeastie, *sprPlayer);
+	iCollision=JoustCollision(sprEnemy, *sprPlayer);
 
 	if (iCollision != COLLISION_MISSED)
 	{
-		if (sprBeastie.xPosition<(*sprPlayer).xPosition)
+		if (sprEnemy.xPosition<(*sprPlayer).xPosition)
 		{
-			sprBeastie.Drift=(0-64);
+			sprEnemy.Drift=(0-64);
 			(*sprPlayer).Drift=gameJoust.MaximumDrift;
 		}
 		else
 		{
-			sprBeastie.Drift=64;
+			sprEnemy.Drift=64;
 			(*sprPlayer).Drift=(0-gameJoust.MaximumDrift);
 		}
 	}
@@ -683,7 +683,7 @@ PLAYER MoveBeastie(PLAYER sprBeastie, PLAYER * sprPlayer, GAME gameJoust)
 			//Will the player object be updated?
 			//Answer. Probably not
 			//Means I have to pass sprPlayer as a pointer perchance?
-			//And don't forget to bounce the beastie
+			//And don't forget to bounce the Enemy
 			(*sprPlayer).Animation=0;
 			(*sprPlayer).FlapCount=0;
 			(*sprPlayer).Flags=FLAG_DEAD;
@@ -691,20 +691,20 @@ PLAYER MoveBeastie(PLAYER sprBeastie, PLAYER * sprPlayer, GAME gameJoust)
 			break;
 		case COLLISION_PLAYERWINS:
 			//Bounce the player object away
-			sprBeastie.Animation=0;
-			sprBeastie.FlapCount=0;
-			//sprBeastie.Flags=FLAG_EGG;
-			sprBeastie.Flags=FLAG_EGG;
+			sprEnemy.Animation=0;
+			sprEnemy.FlapCount=0;
+			//sprEnemy.Flags=FLAG_EGG;
+			sprEnemy.Flags=FLAG_EGG;
 			//Rebuild the sprite
-			//Need to know the beastie number?
-			SetSprite(SPRITE_Enemy+(sprBeastie.Index<<3), TILE_Enemy+(sprBeastie.Index<<3), 0, sprBeastie.xPosition>>8, sprBeastie.yPosition>>8, PAL_EGG,24);
-			SetSprite(SPRITE_Enemy+(sprBeastie.Index<<3)+1, TILE_Enemy+(sprBeastie.Index<<3)+1, 1, 8, 0, PAL_EGG,24);
-			SetSprite(SPRITE_Enemy+(sprBeastie.Index<<3)+2, TILE_Enemy+(sprBeastie.Index<<3)+2, 1, -8, 8, PAL_EGG,24);
-			SetSprite(SPRITE_Enemy+(sprBeastie.Index<<3)+3, TILE_Enemy+(sprBeastie.Index<<3)+3, 1, 8, 0, PAL_EGG,24);
-			SetSprite(SPRITE_Enemy+(sprBeastie.Index<<3)+4, TILE_Enemy+(sprBeastie.Index<<3)+4, 1, -8, -8, PAL_EGG+1,24);
-			SetSprite(SPRITE_Enemy+(sprBeastie.Index<<3)+5, TILE_Enemy+(sprBeastie.Index<<3)+5, 1, 8, 0, PAL_EGG+1,24);
-			SetSprite(SPRITE_Enemy+(sprBeastie.Index<<3)+6, TILE_Enemy+(sprBeastie.Index<<3)+6, 1, -8, 8, PAL_EGG+1,24);
-			SetSprite(SPRITE_Enemy+(sprBeastie.Index<<3)+7, TILE_Enemy+(sprBeastie.Index<<3)+7, 1, 8, 0, PAL_EGG+1,24);
+			//Need to know the Enemy number?
+			SetSprite(SPRITE_Enemy+(sprEnemy.Index<<3), TILE_Enemy+(sprEnemy.Index<<3), 0, sprEnemy.xPosition>>8, sprEnemy.yPosition>>8, PAL_EGG,24);
+			SetSprite(SPRITE_Enemy+(sprEnemy.Index<<3)+1, TILE_Enemy+(sprEnemy.Index<<3)+1, 1, 8, 0, PAL_EGG,24);
+			SetSprite(SPRITE_Enemy+(sprEnemy.Index<<3)+2, TILE_Enemy+(sprEnemy.Index<<3)+2, 1, -8, 8, PAL_EGG,24);
+			SetSprite(SPRITE_Enemy+(sprEnemy.Index<<3)+3, TILE_Enemy+(sprEnemy.Index<<3)+3, 1, 8, 0, PAL_EGG,24);
+			SetSprite(SPRITE_Enemy+(sprEnemy.Index<<3)+4, TILE_Enemy+(sprEnemy.Index<<3)+4, 1, -8, -8, PAL_EGG+1,24);
+			SetSprite(SPRITE_Enemy+(sprEnemy.Index<<3)+5, TILE_Enemy+(sprEnemy.Index<<3)+5, 1, 8, 0, PAL_EGG+1,24);
+			SetSprite(SPRITE_Enemy+(sprEnemy.Index<<3)+6, TILE_Enemy+(sprEnemy.Index<<3)+6, 1, -8, 8, PAL_EGG+1,24);
+			SetSprite(SPRITE_Enemy+(sprEnemy.Index<<3)+7, TILE_Enemy+(sprEnemy.Index<<3)+7, 1, 8, 0, PAL_EGG+1,24);
 
 			(*sprPlayer).Score+=250;
 
@@ -715,7 +715,7 @@ PLAYER MoveBeastie(PLAYER sprBeastie, PLAYER * sprPlayer, GAME gameJoust)
 	}
 
 
-	return sprBeastie;
+	return sprEnemy;
 
 }
 
@@ -723,6 +723,9 @@ PLAYER MoveEgg(PLAYER sprEgg, PLAYER * sprPlayer, GAME gameJoust)
 {
 	u16 xDistance;
 	u16 yDistance;
+	u8 iTileX;
+	u8 iTileY;
+	u8 iCollision;
 
 	//Animate the egg
 	//Should only happen when the egg is moving
@@ -772,11 +775,39 @@ PLAYER MoveEgg(PLAYER sprEgg, PLAYER * sprPlayer, GAME gameJoust)
 
 	//Finally, add gravity and drift to the egg.
 
-	//sprBeastie.Flags=FLAG_DEAD;
+	sprEgg.xPosition+=sprEgg.Drift;
+	sprEgg.yPosition-=(sprEgg.Velocity--) + gameJoust.Gravity;
+
+	// Then check for background collisions
+	iTileX=sprEgg.xPosition>>11;
+	iTileY=sprEgg.yPosition>>11;
+
+	iCollision=BackgroundCollisionTest(iTileX, iTileY);
+	if (iCollision & DIR_UP)
+	{
+		sprEgg.Velocity=0;
+	}
+	if (iCollision & DIR_DOWN)
+	{
+		//Collision Detection for "down" is exactly one unit too high.
+		//Must remember that Buzzards never walk!
+		//Change mode to "walking"
+		//This is very very poor.
+		sprEgg.Velocity=0;
+		sprEgg.Drift=0;
+	}
+
+	if (sprEgg.yPosition > 34816)
+	{
+		//set appropriate flags
+		sprEgg.Flags=FLAG_DEAD;
+	}
+
+	//sprEnemy.Flags=FLAG_DEAD;
 	return sprEgg;
 }
 
-PLAYER OldMoveEgg(PLAYER sprBeastie, PLAYER * sprPlayer, GAME gameJoust)
+PLAYER OldMoveEgg(PLAYER sprEnemy, PLAYER * sprPlayer, GAME gameJoust)
 {
 
 u8 iFlapLoop;
@@ -791,41 +822,41 @@ u8 iFlapping;
 	//Move the egg...
 
 	//Eggs don't flap
-	if (sprBeastie.Mode==FLYING)
+	if (sprEnemy.Mode==FLYING)
 	{
-		sprBeastie.Velocity = sprBeastie.Velocity + gameJoust.Gravity;
+		sprEnemy.Velocity = sprEnemy.Velocity + gameJoust.Gravity;
 		//Boundary checks...
-		if (sprBeastie.Velocity > gameJoust.MaximumVelocity)
-			sprBeastie.Velocity = gameJoust.MaximumVelocity;
-		if (sprBeastie.Velocity < (0 - gameJoust.MaximumVelocity))
-			sprBeastie.Velocity = (0 - gameJoust.MaximumVelocity);
+		if (sprEnemy.Velocity > gameJoust.MaximumVelocity)
+			sprEnemy.Velocity = gameJoust.MaximumVelocity;
+		if (sprEnemy.Velocity < (0 - gameJoust.MaximumVelocity))
+			sprEnemy.Velocity = (0 - gameJoust.MaximumVelocity);
 
 		//Need to add... Boundary checks...
-		if (sprBeastie.Velocity<0)
+		if (sprEnemy.Velocity<0)
 		{
 			//Only apply negative velocity if it results in moving "Up"
 			//i.e. Checks for wrap around at the top of the screen...
-			if (sprBeastie.yPosition>sprBeastie.yPosition+(sprBeastie.Velocity>>2))
+			if (sprEnemy.yPosition>sprEnemy.yPosition+(sprEnemy.Velocity>>2))
 			{
-				sprBeastie.yPosition+=(sprBeastie.Velocity>>2);
+				sprEnemy.yPosition+=(sprEnemy.Velocity>>2);
 			}
 			else
 			{
 				//Bounce
-				sprBeastie.Velocity=0-(sprBeastie.Velocity);
+				sprEnemy.Velocity=0-(sprEnemy.Velocity);
 			}
 		}
 		else
 		{
-			sprBeastie.yPosition+=(sprBeastie.Velocity>>2);
+			sprEnemy.yPosition+=(sprEnemy.Velocity>>2);
 		}
 	}
-	sprBeastie.xPosition+=(sprBeastie.Drift>>7);
+	sprEnemy.xPosition+=(sprEnemy.Drift>>7);
 
 	//Calculate collisions with the background...
 	//Start by getting the current tile position.
-	iTileX=sprBeastie.xPosition>>11;
-	iTileY=sprBeastie.yPosition>>11;
+	iTileX=sprEnemy.xPosition>>11;
+	iTileY=sprEnemy.yPosition>>11;
 	//Yer basic rules:
 	//If yPosition > $foo
 	//    We're in Lava - sink the player
@@ -834,44 +865,44 @@ u8 iFlapping;
 	iCollision=BackgroundCollisionTest(iTileX, iTileY);
 	if (iCollision & DIR_UP)
 	{
-		sprBeastie.Velocity=0;
+		sprEnemy.Velocity=0;
 	}
 	if (iCollision & DIR_DOWN)
 	{
 		//For some reason... This doesn't actually stop the egg - it slowly falls
 		//through the platforms?
 		//Aha. Changing the mode helps!
-		sprBeastie.Drift=sprBeastie.Drift / 2;
-		if (sprBeastie.Velocity>=0)
+		sprEnemy.Drift=sprEnemy.Drift / 2;
+		if (sprEnemy.Velocity>=0)
 		{
 			//This *should* bounce the egg? Doesn't appear to do much though?
-			sprBeastie.Velocity=(0 - sprBeastie.Velocity);
+			sprEnemy.Velocity=(0 - sprEnemy.Velocity);
 			//Reduce drift
 		}
 		else
 		{
-			sprBeastie.Mode=WALKING;
+			sprEnemy.Mode=WALKING;
 		}
 	}
 	else
 	{
-		sprBeastie.Mode=FLYING;
+		sprEnemy.Mode=FLYING;
 	}
 	if (iCollision & DIR_LEFT)
 	{
-		sprBeastie.Drift=(0 - sprBeastie.Drift);
+		sprEnemy.Drift=(0 - sprEnemy.Drift);
 	}
 	if (iCollision & DIR_RIGHT)
 	{
-		sprBeastie.Drift=(0 - sprBeastie.Drift);
+		sprEnemy.Drift=(0 - sprEnemy.Drift);
 	}
 
 	//Test to see whether the player is in the lava...
 	//Fairly simple really, if the player is lower than a certain point. Then they're dead!
-	if (sprBeastie.yPosition > 34816)
+	if (sprEnemy.yPosition > 34816)
 	{
 		//set appropriate flags
-		sprBeastie.Flags=FLAG_DEAD;
+		sprEnemy.Flags=FLAG_DEAD;
 
 		//Question is. What am I going to do with said flag...
 		//Ultimately, I need to reduce the "lives" count and force the main() loop to
@@ -879,21 +910,21 @@ u8 iFlapping;
 	}
 
 	//Not sure about this bit either...
-	iCollision=JoustCollision(sprBeastie, *sprPlayer);
+	iCollision=JoustCollision(sprEnemy, *sprPlayer);
 
 	//Rather odd. Never actually seems to hit?
 
 	if (iCollision != COLLISION_MISSED)
 	{
 		//Pick up the egg!
-		sprBeastie.Animation=0;
-		sprBeastie.FlapCount=0;
-		sprBeastie.Flags=FLAG_DEAD;
+		sprEnemy.Animation=0;
+		sprEnemy.FlapCount=0;
+		sprEnemy.Flags=FLAG_DEAD;
 		(*sprPlayer).Score+=500;
 	}
 
 	//So... After all that, this doesn't actually do that much does it?
-	return sprBeastie;
+	return sprEnemy;
 }
 
 void DrawArena(void)
@@ -1255,51 +1286,51 @@ GAME DrawLogo()
 
 }
 
-void MoveBuzzard(PLAYER * sprBeastie, PLAYER * sprPlayer, GAME gameJoust, u8 * iBuzzardCount)
+void MoveBuzzard(PLAYER * sprEnemy, PLAYER * sprPlayer, GAME gameJoust, u8 * iBuzzardCount)
 {
-	//Is the beastie alive or dead?
-	if ((*sprBeastie).Flags==0)
+	//Is the Enemy alive or dead?
+	if ((*sprEnemy).Flags==0)
 	{
 		//It lives!!!!
-		(*sprBeastie)=MoveBeastie(*sprBeastie, sprPlayer, gameJoust);
+		(*sprEnemy)=MoveEnemy(*sprEnemy, sprPlayer, gameJoust);
 
-		CopyJoustSprite((u16*)FlyingBuzzard, TILE_Enemy+((*sprBeastie).Index<<3), (*sprBeastie).Direction, (*sprBeastie).Animation);
+		CopyJoustSprite((u16*)FlyingBuzzard, TILE_Enemy+((*sprEnemy).Index<<3), (*sprEnemy).Direction, (*sprEnemy).Animation);
 
-		SetSpritePosition(SPRITE_Enemy+((*sprBeastie).Index<<3), (*sprBeastie).xPosition>>8, (*sprBeastie).yPosition>>8);
+		SetSpritePosition(SPRITE_Enemy+((*sprEnemy).Index<<3), (*sprEnemy).xPosition>>8, (*sprEnemy).yPosition>>8);
 	}
-	else if ((*sprBeastie).Flags==FLAG_EGG)
+	else if ((*sprEnemy).Flags==FLAG_EGG)
 	{
 		//Bounce that egg around
-		(*sprBeastie)=MoveEgg(*sprBeastie, sprPlayer, gameJoust);
+		(*sprEnemy)=MoveEgg(*sprEnemy, sprPlayer, gameJoust);
 
 		//Decrement the buzzard count if need be
-		if ((*sprBeastie).Flags==FLAG_DEAD)
+		if ((*sprEnemy).Flags==FLAG_DEAD)
 			(*iBuzzardCount)--;
 
 		//CopyJoustSprite should do the palette management too?
-		CopyJoustSprite((u16*)Egg, TILE_Enemy+((*sprBeastie).Index<<3), 0, (*sprBeastie).Animation);
-		SetSpritePosition(SPRITE_Enemy+((*sprBeastie).Index<<3), (*sprBeastie).xPosition>>8, (*sprBeastie).yPosition>>8);
+		CopyJoustSprite((u16*)Egg, TILE_Enemy+((*sprEnemy).Index<<3), 0, (*sprEnemy).Animation);
+		SetSpritePosition(SPRITE_Enemy+((*sprEnemy).Index<<3), (*sprEnemy).xPosition>>8, (*sprEnemy).yPosition>>8);
 
 	}
 	else
 	{
-		//Poor beastie
+		//Poor Enemy
 		//Check the death animation and copy a new sprite if need be
 		//I'll have to worry about eggs sometime soon too
 
 		//So... We have multiple "death" flags.
-		//Flags==1 : Turn beastie into an egg and throw it around the screen somewhat
-		//Flags==2 : This time I mean it - The beastie really is dead
+		//Flags==1 : Turn Enemy into an egg and throw it around the screen somewhat
+		//Flags==2 : This time I mean it - The Enemy really is dead
 
 		//Oops. Suddenly speeds up when all the buzzards are dead...
-		if ((*sprBeastie).FlapCount<=64)
+		if ((*sprEnemy).FlapCount<=64)
 		{
-			if ((*sprBeastie).FlapCount==64)
+			if ((*sprEnemy).FlapCount==64)
 			{
-				(*sprBeastie).Animation=1;
+				(*sprEnemy).Animation=1;
 			}
-			(*sprBeastie).FlapCount++;
+			(*sprEnemy).FlapCount++;
 		}
-		CopyJoustSprite((u16*)Death, TILE_Enemy+((*sprBeastie).Index<<3), 0, (*sprBeastie).Animation);
+		CopyJoustSprite((u16*)Death, TILE_Enemy+((*sprEnemy).Index<<3), 0, (*sprEnemy).Animation);
 	}
 }

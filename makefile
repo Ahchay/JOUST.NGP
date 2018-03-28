@@ -3,7 +3,6 @@ NAME = JOUST
 OBJS = \
 	main.rel \
 	library.rel \
-	
 
 $(NAME).ngp: makefile ngpc.lcf $(OBJS)
 	tulink -la -o $(NAME).abs ngpc.lcf system.lib $(OBJS)

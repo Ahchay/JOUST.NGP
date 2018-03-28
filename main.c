@@ -53,7 +53,7 @@ void main()
 	u8 iLevel;
 	u16 iSleepCount;
 	PLAYER sprPlayer;
-	PLAYER sprBeastie[BUZZARD_COUNT];
+	PLAYER sprEnemy[BUZZARD_COUNT];
 	GAME gameJoust;
 
 	InitNGPC();
@@ -146,38 +146,38 @@ void main()
 			SetSprite(SPRITE_Player+7, TILE_Player+7, 1, 8, 0, PAL_PLAYER+1,24);
 
 
-			//Setup our beasties
+			//Setup our enemies
 			iBuzzardCount=BUZZARD_COUNT;
 			for (iLoop=0;iLoop<iBuzzardCount;iLoop++)
 			{
-				sprBeastie[iLoop].Index=iLoop;
-				sprBeastie[iLoop].xPosition=GetRandom(65535);
-				sprBeastie[iLoop].yPosition=GetRandom(32767);
-				sprBeastie[iLoop].Velocity=0;
+				sprEnemy[iLoop].Index=iLoop;
+				sprEnemy[iLoop].xPosition=GetRandom(65535);
+				sprEnemy[iLoop].yPosition=GetRandom(32767);
+				sprEnemy[iLoop].Velocity=0;
 				if (GetRandom(65535)<32768)
 				{
-					sprBeastie[iLoop].Drift=64;
-					sprBeastie[iLoop].Direction=0;
+					sprEnemy[iLoop].Drift=64;
+					sprEnemy[iLoop].Direction=0;
 				}
 				else
 				{
-					sprBeastie[iLoop].Drift=-64;
-					sprBeastie[iLoop].Direction=1;
+					sprEnemy[iLoop].Drift=-64;
+					sprEnemy[iLoop].Direction=1;
 				}
-				sprBeastie[iLoop].Animation=0;
-				sprBeastie[iLoop].FlapCount=QRandom();
-				sprBeastie[iLoop].ButtonState=0;
-				sprBeastie[iLoop].Flags=0;
-				sprBeastie[iLoop].Type=ENEMYSHADOWLORD;
+				sprEnemy[iLoop].Animation=0;
+				sprEnemy[iLoop].FlapCount=QRandom();
+				sprEnemy[iLoop].ButtonState=0;
+				sprEnemy[iLoop].Flags=0;
+				sprEnemy[iLoop].Type=ENEMYSHADOWLORD;
 
-				SetSprite(SPRITE_Enemy+(iLoop<<3), TILE_Enemy+(iLoop<<3), 0, sprBeastie[iLoop].xPosition>>8, sprBeastie[iLoop].yPosition>>8, PAL_BUZZARD+((sprBeastie[iLoop].Type<<1)),24);
-				SetSprite(SPRITE_Enemy+(iLoop<<3)+1, TILE_Enemy+(iLoop<<3)+1, 1, 8, 0, PAL_BUZZARD+((sprBeastie[iLoop].Type<<1)),24);
-				SetSprite(SPRITE_Enemy+(iLoop<<3)+2, TILE_Enemy+(iLoop<<3)+2, 1, -8, 8, PAL_BUZZARD+((sprBeastie[iLoop].Type<<1)),24);
-				SetSprite(SPRITE_Enemy+(iLoop<<3)+3, TILE_Enemy+(iLoop<<3)+3, 1, 8, 0, PAL_BUZZARD+((sprBeastie[iLoop].Type<<1)),24);
-				SetSprite(SPRITE_Enemy+(iLoop<<3)+4, TILE_Enemy+(iLoop<<3)+4, 1, -8, -8, PAL_BUZZARD+((sprBeastie[iLoop].Type<<1)+1),24);
-				SetSprite(SPRITE_Enemy+(iLoop<<3)+5, TILE_Enemy+(iLoop<<3)+5, 1, 8, 0, PAL_BUZZARD+((sprBeastie[iLoop].Type<<1)+1),24);
-				SetSprite(SPRITE_Enemy+(iLoop<<3)+6, TILE_Enemy+(iLoop<<3)+6, 1, -8, 8, PAL_BUZZARD+((sprBeastie[iLoop].Type<<1)+1),24);
-				SetSprite(SPRITE_Enemy+(iLoop<<3)+7, TILE_Enemy+(iLoop<<3)+7, 1, 8, 0, PAL_BUZZARD+((sprBeastie[iLoop].Type<<1)+1),24);
+				SetSprite(SPRITE_Enemy+(iLoop<<3), TILE_Enemy+(iLoop<<3), 0, sprEnemy[iLoop].xPosition>>8, sprEnemy[iLoop].yPosition>>8, PAL_BUZZARD+((sprEnemy[iLoop].Type<<1)),24);
+				SetSprite(SPRITE_Enemy+(iLoop<<3)+1, TILE_Enemy+(iLoop<<3)+1, 1, 8, 0, PAL_BUZZARD+((sprEnemy[iLoop].Type<<1)),24);
+				SetSprite(SPRITE_Enemy+(iLoop<<3)+2, TILE_Enemy+(iLoop<<3)+2, 1, -8, 8, PAL_BUZZARD+((sprEnemy[iLoop].Type<<1)),24);
+				SetSprite(SPRITE_Enemy+(iLoop<<3)+3, TILE_Enemy+(iLoop<<3)+3, 1, 8, 0, PAL_BUZZARD+((sprEnemy[iLoop].Type<<1)),24);
+				SetSprite(SPRITE_Enemy+(iLoop<<3)+4, TILE_Enemy+(iLoop<<3)+4, 1, -8, -8, PAL_BUZZARD+((sprEnemy[iLoop].Type<<1)+1),24);
+				SetSprite(SPRITE_Enemy+(iLoop<<3)+5, TILE_Enemy+(iLoop<<3)+5, 1, 8, 0, PAL_BUZZARD+((sprEnemy[iLoop].Type<<1)+1),24);
+				SetSprite(SPRITE_Enemy+(iLoop<<3)+6, TILE_Enemy+(iLoop<<3)+6, 1, -8, 8, PAL_BUZZARD+((sprEnemy[iLoop].Type<<1)+1),24);
+				SetSprite(SPRITE_Enemy+(iLoop<<3)+7, TILE_Enemy+(iLoop<<3)+7, 1, 8, 0, PAL_BUZZARD+((sprEnemy[iLoop].Type<<1)+1),24);
 
 			}
 
@@ -193,7 +193,7 @@ void main()
 				PrintString(SCR_1_PLANE, PAL_GAMETEXT, 10, 5, "LEVEL ");
 				PrintDecimal(SCR_1_PLANE, PAL_GAMETEXT, 16, 5, iLevel, 3);
 				PrintString(SCR_1_PLANE, PAL_GAMETEXT, 10, 7, "GENTLEMEN!");
-				PrintString(SCR_1_PLANE, PAL_GAMETEXT, 5, 8, "MOUNT YOUR BEASTIES!");
+				PrintString(SCR_1_PLANE, PAL_GAMETEXT, 6, 8, "ALIGHT YOUR STEED!");
 				iSleepCount=256;
 
 				//I'm beginning to see the attraction of state machines...
@@ -212,10 +212,10 @@ void main()
 					{
 						CopyJoustSprite((u16*)Walking, TILE_Player, sprPlayer.Direction, sprPlayer.Animation);
 					}
-					//Do the same for our beasties
+					//Do the same for our Enemys
 					for (iLoop=0;iLoop<BUZZARD_COUNT;iLoop++)
 					{
-						MoveBuzzard(&sprBeastie[iLoop], &sprPlayer, gameJoust, &iBuzzardCount);
+						MoveBuzzard(&sprEnemy[iLoop], &sprPlayer, gameJoust, &iBuzzardCount);
 					}
 					iSleepCount--;
 				}
@@ -270,10 +270,10 @@ void main()
 					SetSpritePosition(SPRITE_Player, sprPlayer.xPosition>>8, sprPlayer.yPosition>>8);
 					SetScrollPosition((sprPlayer.xPosition>>8)-8);
 
-					//Do the same for our beasties
+					//Do the same for our Enemys
 					for (iLoop=0;iLoop<BUZZARD_COUNT;iLoop++)
 					{
-						MoveBuzzard(&sprBeastie[iLoop], &sprPlayer, gameJoust, &iBuzzardCount);
+						MoveBuzzard(&sprEnemy[iLoop], &sprPlayer, gameJoust, &iBuzzardCount);
 					}
 				}
 				//Players dead. Oh no! What do I do!
@@ -284,15 +284,15 @@ void main()
 					CopyJoustSprite((u16*)Death, TILE_Player, 0, 0);
 
 					//Or just go to sleep for a bit...
-					//Keep animating the beasties while we sleep (ie. we don't sleep)
+					//Keep animating the Enemys while we sleep (ie. we don't sleep)
 
 					iSleepCount=64;
 					while (iSleepCount>0)
 					{
-						//Do the same for our beasties
+						//Do the same for our Enemys
 						for (iLoop=0;iLoop<BUZZARD_COUNT;iLoop++)
 						{
-							MoveBuzzard(&sprBeastie[iLoop], &sprPlayer, gameJoust, &iBuzzardCount);
+							MoveBuzzard(&sprEnemy[iLoop], &sprPlayer, gameJoust, &iBuzzardCount);
 						}
 						iSleepCount--;
 					}
