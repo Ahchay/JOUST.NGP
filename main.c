@@ -61,10 +61,6 @@ void main()
 
 	InitialiseQRandom();
 
-	//Neotracker
-	NeoTracker_InstallDriver();
-	NeoTracker_SendGroup(Ostrich_Data, Ostrich_Len);
-
 	InstallTileSetAt(JoustText, sizeof(JoustText)/2, 65);
 
 	DrawRugPattern();
