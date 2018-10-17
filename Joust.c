@@ -1132,9 +1132,10 @@ GAME DrawLogo()
 
 	//Problems with the music...
 	//Only plays once?
-	//Slows down the emulation.
-	//It's shit.
 
+	//Remember to install Neotracker every time you need to use it...
+	NeoTracker_InstallDriver();
+	NeoTracker_SendGroup(Ostrich_Data, Ostrich_Len);
 	NeoTracker_PlayMusic(BGM_OSTRICH);
 
 	while (!(JOYPAD & J_A))
@@ -1150,6 +1151,8 @@ GAME DrawLogo()
 		Sleep(1);
 	}
 	NeoTracker_StopAll();
+	// And then re-install the main sound driver
+	InstallSoundDriver();
 
 	//Get the game options...
 	//Start by clearing the game text bits
