@@ -1074,6 +1074,7 @@ GAME DrawLogo()
 	u16 iBorderColour;
 	u8 iCurrentOption;
 	u8 iGameStart;
+	u16 iMusicCounter;
 	GAME gameReturn;
 
 	//Set default game parameters
@@ -1132,11 +1133,17 @@ GAME DrawLogo()
 
 	//Problems with the music...
 	//Only plays once?
+	//To get around that - implement (u16)Ostrich_timer in the vblank interrupt
+	//and set to compare against Ostrich_Len (#defined in Ostrich.h)
+	//restart playing the tune when Ostrich_timer>Ostrich_Len?
+	//It might need to be a bit more finessed than that, as the data length
+	//of the song (Ostrich_Len) may or may not equate to the song length.
 
 	//Remember to install Neotracker every time you need to use it...
 	NeoTracker_InstallDriver();
 	NeoTracker_SendGroup(Ostrich_Data, Ostrich_Len);
 	NeoTracker_PlayMusic(BGM_OSTRICH);
+	iMusicCounter=0;
 
 	while (!(JOYPAD & J_A))
 	{
@@ -1149,6 +1156,11 @@ GAME DrawLogo()
 		CopySpriteTile((u16*)Border, GeneralTileBase, iBorderCount);
 
 		Sleep(1);
+		if (Ostrich_Len>iMusicCounter)
+		{
+			PrintString(SCR_2_PLANE, PAL_LOGOTEXT, 4, 11, "MUSIC FINISHED?");
+		}
+
 	}
 	NeoTracker_StopAll();
 	// And then re-install the main sound driver
