@@ -91,7 +91,6 @@ const unsigned short FlyingBuzzard[32][8] =
 };
 
 #include "JoustFlap.c"
-#include "eatdot.c"
 #include "JoustThud.c"
 
 u8 JoustCollision(PLAYER sprPlayer, PLAYER sprBuzzard)
@@ -518,7 +517,7 @@ PLAYER MovePlayer(PLAYER sprPlayer, GAME gameJoust)
 		sprPlayer.ButtonState=J_A;
 		//This *should* play the joust flap noise.
 		//What do I get? Silence. Great.
-		SysPlayWave(eatdot);
+		SysPlayWave(JoustFlap);
 	}
 	else if (sprPlayer.ButtonState & J_A)
 	{
@@ -687,7 +686,7 @@ PLAYER MoveEnemy(PLAYER sprEnemy, PLAYER * sprPlayer, GAME gameJoust)
 			(*sprPlayer).Animation=0;
 			(*sprPlayer).FlapCount=0;
 			(*sprPlayer).Flags=FLAG_DEAD;
-			SysPlayWave(eatdot);
+			SysPlayWave(JoustThud);
 			break;
 		case COLLISION_PLAYERWINS:
 			//Bounce the player object away
@@ -708,7 +707,7 @@ PLAYER MoveEnemy(PLAYER sprEnemy, PLAYER * sprPlayer, GAME gameJoust)
 
 			(*sprPlayer).Score+=250;
 
-			SysPlayWave(eatdot);
+			SysPlayWave(JoustThud);
 			break;
 		default:
 			break;
@@ -1164,6 +1163,7 @@ GAME DrawLogo()
 	}
 	NeoTracker_StopAll();
 	// And then re-install the main sound driver
+	// Question. Can I use NeoTracker_PlaySFX() to play the sound effects instead?
 	InstallSoundDriver();
 
 	//Get the game options...
